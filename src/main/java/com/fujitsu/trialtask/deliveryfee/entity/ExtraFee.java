@@ -1,8 +1,7 @@
 package com.fujitsu.trialtask.deliveryfee.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,13 +12,23 @@ import java.math.BigDecimal;
 @Setter
 @Table(name = "extra_fee")
 public class ExtraFee {
-    // TODO: Composite PK (vehicleId && code)
-    @Column(name = "vehicle_id")
-    Long vehicleId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
-    @Column(name = "code")
-    String code;
+    @NotNull
+    @JoinColumn(name = "vehicle_id")
+    @ManyToOne
+    private Vehicle vehicle;
 
-    @Column(name = "amount")
-    BigDecimal amount;
+    @NotNull
+    @JoinColumn(name = "code")
+    @ManyToOne
+    private ExtraFeeCode code;
+
+    @NotNull
+    @Column(name = "fee_amount")
+    private BigDecimal feeAmount;
+
 }

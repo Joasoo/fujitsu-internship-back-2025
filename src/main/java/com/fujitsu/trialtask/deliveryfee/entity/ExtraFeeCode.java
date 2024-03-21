@@ -7,13 +7,13 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "vehicle")
-public class Vehicle {
+@Table(name = "extra_fee_code")
+public class ExtraFeeCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    Long id;
+    @Column(name = "code")
+    String code;
 
-    @Column(name = "type")
-    String type;
+    @Column(name = "code_class")
+    String codeClass;
 }

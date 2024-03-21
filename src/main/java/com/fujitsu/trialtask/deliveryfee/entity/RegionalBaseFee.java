@@ -1,6 +1,7 @@
 package com.fujitsu.trialtask.deliveryfee.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,15 +13,21 @@ import java.math.BigDecimal;
 @Table(name = "regional_base_fee")
 public class RegionalBaseFee {
     @Id
-    @Column(name = "city_id")
-    private Long cityId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
-    @Column(name = "car")
-    private BigDecimal car;
+    @NotNull
+    @JoinColumn(name = "city_id")
+    @ManyToOne
+    private City city;
 
-    @Column(name = "bike")
-    private BigDecimal bike;
+    @NotNull
+    @JoinColumn(name = "vehicle_id")
+    @ManyToOne
+    private Vehicle vehicle;
 
-    @Column(name = "scooter")
-    private BigDecimal scooter;
+    @NotNull
+    @Column(name = "fee_amount")
+    private BigDecimal feeAmount;
 }
