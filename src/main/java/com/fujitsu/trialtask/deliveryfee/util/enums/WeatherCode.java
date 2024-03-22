@@ -1,7 +1,7 @@
 package com.fujitsu.trialtask.deliveryfee.util.enums;
 
 /** Extra fee codes for different weather conditions. **/
-public enum ExtraFeeCode {
+public enum WeatherCode {
     /** Air temperature under -10 degrees Celsius. **/
     ATEF_UNDER_MINUS_TEN,
     /** Air temperature between -10 and 0 degrees Celsius (including). **/
