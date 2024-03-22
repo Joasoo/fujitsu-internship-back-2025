@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DeliveryFeeService {
@@ -151,7 +150,7 @@ public class DeliveryFeeService {
     private CodeItem getWeatherCodeItem(WeatherCode code) throws WeatherCodeItemException {
         return codeItemRepository.findByCode(code.name()).orElseThrow(
                 () -> new WeatherCodeItemException("Code item does not exist.",
-                        DeliveryFeeException.Reason.CODE_ITEM_DOES_NOT_EXIST, code)
+                        DeliveryFeeException.Reason.CODE_ITEM_DOES_NOT_EXIST, code.name())
         );
     }
 }
