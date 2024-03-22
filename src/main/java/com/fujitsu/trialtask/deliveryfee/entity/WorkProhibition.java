@@ -5,16 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Entity
 @Getter
 @Setter
-@Table(name = "extra_fee")
-public class ExtraFee {
+@Table(name = "work_prohibition")
+public class WorkProhibition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
     @NotNull
@@ -26,9 +23,4 @@ public class ExtraFee {
     @JoinColumn(name = "code_item")
     @ManyToOne
     private CodeItem codeItem;
-
-    @NotNull
-    @Column(name = "fee_amount")
-    private BigDecimal feeAmount;
-
 }

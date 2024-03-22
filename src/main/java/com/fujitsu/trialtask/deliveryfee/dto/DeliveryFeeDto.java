@@ -10,5 +10,7 @@ import java.math.BigDecimal;
 public class DeliveryFeeDto {
     private Long vehicleId;
     private Long cityId;
-    private BigDecimal fee;
+    private BigDecimal baseFee;
+    private BigDecimal extraFee;
+    private BigDecimal totalFee;
 }

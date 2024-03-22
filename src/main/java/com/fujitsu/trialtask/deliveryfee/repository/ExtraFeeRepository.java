@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface ExtraFeeRepository extends JpaRepository<ExtraFee, Long> {
-    Optional<ExtraFee> findByVehicleIdAndCode(Long vehicleId, String code);
+    Optional<ExtraFee> findByVehicleIdAndCodeItemCode(Long vehicleId, String code);
 }

@@ -2,10 +2,10 @@ package com.fujitsu.trialtask.deliveryfee.util.exception;
 
 import com.fujitsu.trialtask.deliveryfee.util.enums.WeatherCode;
 
-public class ExtraFeeCodeException extends DeliveryFeeException {
+public class WeatherCodeItemException extends DeliveryFeeException {
 
     private final WeatherCode code;
-    public ExtraFeeCodeException(String message, Reason reason, WeatherCode code) {
+    public WeatherCodeItemException(String message, Reason reason, WeatherCode code) {
         super(message, reason);
         this.code = code;
     }
