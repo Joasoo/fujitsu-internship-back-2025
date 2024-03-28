@@ -37,7 +37,7 @@ public class WeatherService {
         return weatherMeasurementMapper.toDto(measurement);
     }
 
-    @Scheduled(cron = "0 15 * * * ")
+    @Scheduled(cron = "0 15 * * * *")
     private void updateWeather() {
         final WeatherObservationDto observation = requestWeatherObservation();
         if (observation == null) {
