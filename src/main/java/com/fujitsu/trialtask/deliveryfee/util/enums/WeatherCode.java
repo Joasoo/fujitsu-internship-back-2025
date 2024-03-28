@@ -1,12 +1,12 @@
 package com.fujitsu.trialtask.deliveryfee.util.enums;
 
-/** Extra fee codes for different weather conditions. **/
+/** Codes for different weather conditions. **/
 public enum WeatherCode {
     /** Air temperature under -10 degrees Celsius. **/
     AT_UNDER_MINUS_TEN,
-    /** Air temperature between -10 and 0 degrees Celsius (including). **/
+    /** Air temperature between -10 to 0 degrees Celsius (including). **/
     AT_MINUS_TEN_TO_ZERO,
-    /** Wind speed between 10m/s and 20m/s (including). **/
+    /** Wind speed between 10m/s to 20m/s (including). **/
     WS_TEN_TO_TWENTY,
     /** Wind speed above 20m/s. **/
     WS_ABOVE_TWENTY,

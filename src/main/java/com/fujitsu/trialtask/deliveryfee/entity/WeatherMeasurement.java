@@ -3,6 +3,7 @@ package com.fujitsu.trialtask.deliveryfee.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.sql.Timestamp;
 
@@ -23,7 +24,7 @@ public class WeatherMeasurement {
     private String stationName;
 
     @Column(name = "wmo_code")
-    private Integer WMOCode;
+    private Integer WMOcode;
 
     @Column(name = "air_temperature")
     private Float airTemperature;
@@ -33,4 +34,17 @@ public class WeatherMeasurement {
 
     @Column(name = "phenomenon")
     private String phenomenon;
+
+    @Override
+    public String toString() {
+        return new StringBuilder().append("----- Weather Measurement -----\n")
+                .append("ID: ").append(id).append("\n")
+                .append("Timestamp: ").append(timestamp).append("\n")
+                .append("Name: ").append(stationName).append("\n")
+                .append("WMO: ").append(WMOcode).append("\n")
+                .append("Air temperature: ").append(airTemperature).append("\n")
+                .append("Wind Speed: ").append(windSpeed).append("\n")
+                .append("Phenomenon: ").append(phenomenon)
+                .toString();
+    }
 }

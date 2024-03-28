@@ -34,7 +34,7 @@ public class DeliveryFeeService {
         final City city = cityRepository.findById(cityId).orElseThrow(
                 () -> new DeliveryFeeException("Invalid City ID.", DeliveryFeeException.Reason.INVALID_CITY_ID)
         );
-        final WeatherMeasurementDto measurement = weatherService.getLatestMeasurementFromStation(city.getWMOCode());
+        final WeatherMeasurementDto measurement = weatherService.getLatestMeasurementFromStation(city.getWMOcode());
         final List<WeatherCode> weatherCodes = getWeatherCodes(measurement);
 
         if (unfitWeatherConditions(vehicleId, weatherCodes)) {

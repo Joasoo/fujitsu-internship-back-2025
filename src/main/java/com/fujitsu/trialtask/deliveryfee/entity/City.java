@@ -21,5 +21,5 @@ public class City {
 
     @NotNull
     @Column(name = "wmo_code")
-    private Integer WMOCode;
+    private Integer WMOcode;
 }

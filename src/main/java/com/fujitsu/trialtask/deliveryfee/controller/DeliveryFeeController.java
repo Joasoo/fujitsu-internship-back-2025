@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/delivery/fee")
 @RequiredArgsConstructor
 public class DeliveryFeeController {
-    private final DeliveryFeeService service;
+    private final DeliveryFeeService deliveryService;
 
     @GetMapping("/city/{cityId}/vehicle/{vehicleId}")
     public DeliveryFeeDto getDeliveryFee(@PathVariable("cityId") Long cityId, @PathVariable("vehicleId") Long vehicleId) {
-        return service.getDeliveryFee(cityId, vehicleId);
+        return deliveryService.getDeliveryFee(cityId, vehicleId);
     }
 }
