@@ -10,6 +10,8 @@ import com.fujitsu.trialtask.deliveryfee.repository.CityRepository;
 import com.fujitsu.trialtask.deliveryfee.repository.WeatherMeasurementRepository;
 import com.fujitsu.trialtask.deliveryfee.util.constants.RequestURL;
 import com.fujitsu.trialtask.deliveryfee.util.exception.DeliveryFeeException;
+import com.fujitsu.trialtask.deliveryfee.util.exception.WeatherDataException;
+import com.fujitsu.trialtask.deliveryfee.util.exception.WeatherRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -29,9 +31,9 @@ public class WeatherService {
     private final WeatherMeasurementMapper weatherMeasurementMapper;
     private final RestTemplate restTemplate;
 
-    public WeatherMeasurementDto getLatestMeasurementFromStation(Integer stationId) {
-        WeatherMeasurement measurement = weatherMeasurementRepository.findTopByWMOCodeOrderByTimestampDesc(stationId)
-                .orElseThrow(() -> new RuntimeException("TODO"));
+    public WeatherMeasurementDto getLatestMeasurementFromStation(final Integer WMOcode) throws WeatherDataException {
+        WeatherMeasurement measurement = weatherMeasurementRepository.findTopByWMOCodeOrderByTimestampDesc(WMOcode)
+                .orElseThrow(() -> new WeatherDataException("Weather data is not available", WMOcode));
         return weatherMeasurementMapper.toDto(measurement);
     }
 
@@ -39,11 +41,11 @@ public class WeatherService {
     private void updateWeather() {
         final WeatherObservationDto observation = requestWeatherObservation();
         if (observation == null) {
-            // TODO: Throw exception
+            throw new WeatherRequestException("Weather observation from request is null");
         }
         final List<WeatherMeasurement> measurements = ObservationDtoToWeatherMeasurements(observation);
         if (measurements.isEmpty()) {
-            // TODO: Throw exception
+            throw new WeatherRequestException("Weather observation from request does not contain measurements");
         }
         weatherMeasurementRepository.saveAll(measurements);
     }
@@ -60,7 +62,7 @@ public class WeatherService {
         return null;
     }
 
-    public List<WeatherMeasurement> ObservationDtoToWeatherMeasurements(WeatherObservationDto observation) {
+    public List<WeatherMeasurement> ObservationDtoToWeatherMeasurements(final WeatherObservationDto observation) {
         // Timestamp constructor requires time in milliseconds.
         final Timestamp timestamp = new Timestamp(observation.getTimeInSeconds() * 1000);
         final List<WeatherStationDto> stations = observation.getStations();

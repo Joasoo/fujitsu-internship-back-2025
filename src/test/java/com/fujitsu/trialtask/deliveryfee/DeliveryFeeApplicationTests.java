@@ -6,6 +6,7 @@ import com.fujitsu.trialtask.deliveryfee.entity.WeatherMeasurement;
 import com.fujitsu.trialtask.deliveryfee.mapper.WeatherMeasurementMapper;
 import com.fujitsu.trialtask.deliveryfee.mapper.WeatherMeasurementMapperImpl;
 import com.fujitsu.trialtask.deliveryfee.repository.CityRepository;
+import com.fujitsu.trialtask.deliveryfee.service.DeliveryFeeService;
 import com.fujitsu.trialtask.deliveryfee.service.WeatherService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
