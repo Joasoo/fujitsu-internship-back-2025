@@ -6,8 +6,9 @@ import com.fujitsu.trialtask.deliveryfee.entity.*;
 import com.fujitsu.trialtask.deliveryfee.repository.*;
 import com.fujitsu.trialtask.deliveryfee.util.enums.WeatherCode;
 import com.fujitsu.trialtask.deliveryfee.util.exception.DeliveryFeeException;
-import com.fujitsu.trialtask.deliveryfee.util.exception.WeatherCodeItemException;
+import com.fujitsu.trialtask.deliveryfee.util.exception.CodeItemException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DeliveryFeeService {
     private final ExtraFeeRepository extraFeeRepository;
@@ -28,11 +30,11 @@ public class DeliveryFeeService {
 
     public DeliveryFeeDto getDeliveryFee(Long cityId, Long vehicleId) throws DeliveryFeeException {
         if (!vehicleRepository.existsById(vehicleId)) {
-            throw new DeliveryFeeException("Invalid vehicle ID.", DeliveryFeeException.Reason.INVALID_VEHICLE_ID);
+            throw new DeliveryFeeException("Invalid vehicle ID", DeliveryFeeException.Reason.INVALID_VEHICLE_ID);
         }
 
         final City city = cityRepository.findById(cityId).orElseThrow(
-                () -> new DeliveryFeeException("Invalid City ID.", DeliveryFeeException.Reason.INVALID_CITY_ID)
+                () -> new DeliveryFeeException("Invalid City ID", DeliveryFeeException.Reason.INVALID_CITY_ID)
         );
         final WeatherMeasurementDto measurement = weatherService.getLatestMeasurementFromStation(city.getWMOcode());
         final List<WeatherCode> weatherCodes = getWeatherCodes(measurement);
@@ -58,12 +60,16 @@ public class DeliveryFeeService {
         return codes;
     }
 
-    private boolean unfitWeatherConditions(Long vehicleId, List<WeatherCode> weatherCodes) throws WeatherCodeItemException {
+    private boolean unfitWeatherConditions(Long vehicleId, List<WeatherCode> weatherCodes) {
         for (WeatherCode code : weatherCodes) {
-            final CodeItem codeItem = getWeatherCodeItem(code);
-            Optional<WorkProhibition> prohibition = workProhibitionRepository.findByVehicleIdAndCodeItemCode(vehicleId, codeItem.getCode());
-            if (prohibition.isPresent()) {
-                return true;
+            try {
+                final CodeItem codeItem = getWeatherCodeItem(code);
+                final Optional<WorkProhibition> prohibition = workProhibitionRepository.findByVehicleIdAndCodeItemCode(vehicleId, codeItem.getCode());
+                if (prohibition.isPresent()) {
+                    return true;
+                }
+            } catch (CodeItemException e) {
+                log.error(String.format("%s. Code: %s", e.getMessage(), e.getCode()));
             }
         }
         return false;
@@ -71,22 +77,24 @@ public class DeliveryFeeService {
 
     private BigDecimal getBaseFeeAmount(Long cityId, Long vehicleId) throws DeliveryFeeException {
         final RegionalBaseFee baseFee = baseFeeRepository.findByCityIdAndVehicleId(cityId, vehicleId)
-                .orElseThrow(() -> new DeliveryFeeException("Base fee for this city and vehicle does not exist",
+                .orElseThrow(() -> new DeliveryFeeException("Invalid city and vehicle combination",
                         DeliveryFeeException.Reason.BASE_FEE_DOES_NOT_EXIST));
         return baseFee.getFeeAmount();
     }
 
-    private BigDecimal getExtraFees(List<WeatherCode> weatherCodes, Long vehicleId) throws WeatherCodeItemException {
+    private BigDecimal getExtraFees(List<WeatherCode> weatherCodes, Long vehicleId) {
         BigDecimal total = BigDecimal.ZERO;
-
         for (WeatherCode code : weatherCodes) {
-            final CodeItem codeItem = getWeatherCodeItem(code);
-            Optional<ExtraFee> extraFee = extraFeeRepository.findByVehicleIdAndCodeItemCode(vehicleId, codeItem.getCode());
-            if (extraFee.isPresent()) {
-                total = total.add(extraFee.get().getFeeAmount());
+            try {
+                final CodeItem codeItem = getWeatherCodeItem(code);
+                final Optional<ExtraFee> extraFee = extraFeeRepository.findByVehicleIdAndCodeItemCode(vehicleId, codeItem.getCode());
+                if (extraFee.isPresent()) {
+                    total = total.add(extraFee.get().getFeeAmount());
+                }
+            } catch (CodeItemException e) {
+                log.error(String.format("%s. Code: %s", e.getMessage(), e.getCode()));
             }
         }
-
         return total;
     }
 
@@ -146,10 +154,9 @@ public class DeliveryFeeService {
         return Optional.empty();
     }
 
-    private CodeItem getWeatherCodeItem(WeatherCode code) throws WeatherCodeItemException {
+    private CodeItem getWeatherCodeItem(WeatherCode code) throws CodeItemException {
         return codeItemRepository.findByCode(code.name()).orElseThrow(
-                () -> new WeatherCodeItemException("Code item does not exist.",
-                        DeliveryFeeException.Reason.CODE_ITEM_DOES_NOT_EXIST, code.name())
+                () -> new CodeItemException("Code item does not exist.", code.name())
         );
     }
 }

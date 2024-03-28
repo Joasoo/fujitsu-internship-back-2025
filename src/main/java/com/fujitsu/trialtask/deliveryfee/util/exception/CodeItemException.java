@@ -1,11 +1,11 @@
 package com.fujitsu.trialtask.deliveryfee.util.exception;
 
 
-public class WeatherCodeItemException extends DeliveryFeeException {
+public class CodeItemException extends RuntimeException {
     private final String code;
 
-    public WeatherCodeItemException(String message, Reason reason, String code) {
-        super(message, reason);
+    public CodeItemException(String message, String code) {
+        super(message);
         this.code = code;
     }
 

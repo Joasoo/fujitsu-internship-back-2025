@@ -7,7 +7,6 @@ public class DeliveryFeeException extends RuntimeException {
         INVALID_VEHICLE_ID,
         UNFIT_WEATHER_CONDITIONS,
         BASE_FEE_DOES_NOT_EXIST,
-        CODE_ITEM_DOES_NOT_EXIST,
     }
 
     private final Reason reason;
