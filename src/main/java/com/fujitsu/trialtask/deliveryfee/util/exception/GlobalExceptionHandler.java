@@ -36,11 +36,10 @@ public final class GlobalExceptionHandler {
 
     @ExceptionHandler({WeatherRequestException.class})
     public void handleWeatherRequestException(WeatherRequestException e) {
-        log.error(e.getMessage(), e);
-    }
-
-    @ExceptionHandler({CodeItemException.class})
-    public void handleCodeItemException(CodeItemException e) {
-        log.error(e.getMessage(), e);
+        if (e.getCause() == null) {
+            log.error(e.getMessage(), e);
+        } else {
+            log.error(e.getMessage(), e, e.getCause());
+        }
     }
 }

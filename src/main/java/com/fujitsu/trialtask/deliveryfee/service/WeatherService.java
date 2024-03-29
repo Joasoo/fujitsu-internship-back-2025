@@ -17,9 +17,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class WeatherService {
      * @throws WeatherDataException Weather data for the station is not available in the database
      */
     public WeatherMeasurementDto getLatestMeasurementFromStation(final Integer WMOcode) throws WeatherDataException {
-        WeatherMeasurement measurement = weatherMeasurementRepository.findTopByWMOCodeOrderByTimestampDesc(WMOcode)
+        WeatherMeasurement measurement = weatherMeasurementRepository.findTopByWMOcodeOrderByTimestampDesc(WMOcode)
                 .orElseThrow(() -> new WeatherDataException("Weather data is not available", WMOcode));
         return weatherMeasurementMapper.toDto(measurement);
     }
@@ -47,11 +49,11 @@ public class WeatherService {
     private void updateWeather() {
         final WeatherObservationDto observation = requestWeatherObservation();
         if (observation == null) {
-            throw new WeatherRequestException("Weather observation from request is null");
+            throw new WeatherRequestException("Weather observation from request is null at " + LocalDateTime.now());
         }
         final List<WeatherMeasurement> measurements = ObservationDtoToWeatherMeasurements(observation);
         if (measurements.isEmpty()) {
-            throw new WeatherRequestException("Weather observation from request does not contain measurements");
+            throw new WeatherRequestException("Weather observation from request does not contain measurements at" + LocalDateTime.now());
         }
         weatherMeasurementRepository.saveAll(measurements);
     }
@@ -62,10 +64,9 @@ public class WeatherService {
 
         try {
             return restTemplate.getForObject(RequestURL.WEATHER_OBSERVATION, WeatherObservationDto.class, headers);
-        } catch (DeliveryFeeException ignored) {
-            // TODO: Throw exception
+        } catch (RestClientException e) {
+            throw new WeatherRequestException("An error has occurred when attempting restTemplate.getForObject()", e.getCause());
         }
-        return null;
     }
 
     private List<WeatherMeasurement> ObservationDtoToWeatherMeasurements(final WeatherObservationDto observation) {

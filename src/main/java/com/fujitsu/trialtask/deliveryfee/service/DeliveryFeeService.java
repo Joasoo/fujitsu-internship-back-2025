@@ -9,6 +9,7 @@ import com.fujitsu.trialtask.deliveryfee.util.exception.DeliveryFeeException;
 import com.fujitsu.trialtask.deliveryfee.util.exception.CodeItemException;
 import com.fujitsu.trialtask.deliveryfee.util.exception.WeatherDataException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DeliveryFeeService {
     private final ExtraFeeRepository extraFeeRepository;
@@ -46,31 +48,20 @@ public class DeliveryFeeService {
         );
         final WeatherMeasurementDto measurement = weatherService.getLatestMeasurementFromStation(city.getWMOcode());
         final List<WeatherCode> weatherCodes = getWeatherCodes(measurement);
+        final List<CodeItem> weatherCodeItems = getCodeItems(weatherCodes.stream().map(WeatherCode::name).toList());
 
-        if (unfitWeatherConditions(vehicleId, weatherCodes)) {
+        if (unfitWeatherConditions(vehicleId, weatherCodeItems)) {
             throw new DeliveryFeeException("Usage of selected vehicle type is forbidden");
         }
 
         final BigDecimal baseFee = getBaseFeeAmount(cityId, vehicleId);
-        final BigDecimal extraFee = getExtraFees(weatherCodes, vehicleId);
+        final BigDecimal extraFee = getExtraFees(weatherCodeItems, vehicleId);
         final BigDecimal totalFee = baseFee.add(extraFee);
         return new DeliveryFeeDto(cityId, vehicleId, baseFee, extraFee, totalFee);
     }
 
-    private List<WeatherCode> getWeatherCodes(final WeatherMeasurementDto measurement) {
-        final List<WeatherCode> codes = new ArrayList<>();
-        final Optional<WeatherCode> airTempCode = getAirTemperatureCode(measurement);
-        final Optional<WeatherCode> windSpeedCode = getWindSpeedCode(measurement);
-        final Optional<WeatherCode> phenomenonCode = getWeatherPhenomenonCode(measurement);
-        airTempCode.ifPresent(codes::add);
-        windSpeedCode.ifPresent(codes::add);
-        phenomenonCode.ifPresent(codes::add);
-        return codes;
-    }
-
-    private boolean unfitWeatherConditions(final Long vehicleId, final List<WeatherCode> weatherCodes) throws CodeItemException {
-        for (WeatherCode code : weatherCodes) {
-            final CodeItem codeItem = getWeatherCodeItem(code);
+    private boolean unfitWeatherConditions(final Long vehicleId, final List<CodeItem> weatherCodes) {
+        for (CodeItem codeItem : weatherCodes) {
             final Optional<WorkProhibition> prohibition =
                     workProhibitionRepository.findByVehicleIdAndCodeItemCode(vehicleId, codeItem.getCode());
             if (prohibition.isPresent()) {
@@ -86,16 +77,26 @@ public class DeliveryFeeService {
         return baseFee.getFeeAmount();
     }
 
-    private BigDecimal getExtraFees(final List<WeatherCode> weatherCodes, final Long vehicleId) throws CodeItemException {
+    private BigDecimal getExtraFees(final List<CodeItem> weatherCodes, final Long vehicleId) {
         BigDecimal total = BigDecimal.ZERO;
-        for (WeatherCode code : weatherCodes) {
-            final CodeItem codeItem = getWeatherCodeItem(code);
+        for (CodeItem codeItem : weatherCodes) {
             final Optional<ExtraFee> extraFee = extraFeeRepository.findByVehicleIdAndCodeItemCode(vehicleId, codeItem.getCode());
             if (extraFee.isPresent()) {
                 total = total.add(extraFee.get().getFeeAmount());
             }
         }
         return total;
+    }
+
+    private List<WeatherCode> getWeatherCodes(final WeatherMeasurementDto measurement) {
+        final List<WeatherCode> codes = new ArrayList<>();
+        final Optional<WeatherCode> airTempCode = getAirTemperatureCode(measurement);
+        final Optional<WeatherCode> windSpeedCode = getWindSpeedCode(measurement);
+        final Optional<WeatherCode> phenomenonCode = getWeatherPhenomenonCode(measurement);
+        airTempCode.ifPresent(codes::add);
+        windSpeedCode.ifPresent(codes::add);
+        phenomenonCode.ifPresent(codes::add);
+        return codes;
     }
 
     private Optional<WeatherCode> getWindSpeedCode(final WeatherMeasurementDto measurement) {
@@ -154,9 +155,16 @@ public class DeliveryFeeService {
         return Optional.empty();
     }
 
-    private CodeItem getWeatherCodeItem(final WeatherCode code) throws CodeItemException {
-        return codeItemRepository.findByCode(code.name()).orElseThrow(
-                () -> new CodeItemException(code.name())
-        );
+    private List<CodeItem> getCodeItems (final List<String> codes) {
+        List<CodeItem> codeItems = new ArrayList<>();
+        for (String code : codes) {
+            try {
+                CodeItem item = codeItemRepository.findByCode(code).orElseThrow(() -> new CodeItemException(code));
+                codeItems.add(item);
+            } catch (CodeItemException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+        return codeItems;
     }
 }
