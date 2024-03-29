@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface WeatherMeasurementRepository extends JpaRepository<WeatherMeasurement, Long> {
-    Optional<WeatherMeasurement> findTopByWMOcodeOrderByTimestampDesc(Integer WMOcode);
+    Optional<WeatherMeasurement> findTopByWeatherStationWMOcodeOrderByTimestampDesc(Integer WMOcode);
 }

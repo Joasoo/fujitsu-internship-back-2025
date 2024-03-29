@@ -1,12 +1,9 @@
 package com.fujitsu.trialtask.deliveryfee;
 
-import com.fujitsu.trialtask.deliveryfee.dto.WeatherObservationDto;
 import com.fujitsu.trialtask.deliveryfee.entity.City;
-import com.fujitsu.trialtask.deliveryfee.entity.WeatherMeasurement;
 import com.fujitsu.trialtask.deliveryfee.mapper.WeatherMeasurementMapper;
 import com.fujitsu.trialtask.deliveryfee.mapper.WeatherMeasurementMapperImpl;
 import com.fujitsu.trialtask.deliveryfee.repository.CityRepository;
-import com.fujitsu.trialtask.deliveryfee.service.DeliveryFeeService;
 import com.fujitsu.trialtask.deliveryfee.service.WeatherService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,8 +13,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
-
-import static org.mockito.BDDMockito.*;
 
 import java.util.List;
 
@@ -35,22 +30,7 @@ class DeliveryFeeApplicationTests {
 
     @BeforeAll
     static void setUp() {
-        City tallinn = new City();
-        tallinn.setId(0L);
-        tallinn.setName("Tallinn");
-        tallinn.setWMOcode(26038);
 
-        City tartu = new City();
-        tallinn.setId(1L);
-        tartu.setName("Tartu");
-        tartu.setWMOcode(26242);
-
-        City parnu = new City();
-        parnu.setId(2L);
-        parnu.setName("Pärnu");
-        parnu.setWMOcode(26231);
-
-        cities = List.of(tallinn, tartu, parnu);
     }
 
     @Test

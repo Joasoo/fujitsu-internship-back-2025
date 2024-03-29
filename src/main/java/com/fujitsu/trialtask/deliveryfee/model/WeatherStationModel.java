@@ -1,11 +1,11 @@
-package com.fujitsu.trialtask.deliveryfee.dto;
+package com.fujitsu.trialtask.deliveryfee.model;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Data;
 
 
 @Data
-public class WeatherStationDto {
+public class WeatherStationModel {
     @JacksonXmlProperty(localName = "name")
     private String stationName;
 

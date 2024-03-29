@@ -18,13 +18,13 @@ public class RegionalBaseFee {
     private Long id;
 
     @NotNull
-    @JoinColumn(name = "city_id")
     @ManyToOne
+    @JoinColumn(name = "city_id")
     private City city;
 
     @NotNull
-    @JoinColumn(name = "vehicle_id")
     @ManyToOne
+    @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
     @NotNull

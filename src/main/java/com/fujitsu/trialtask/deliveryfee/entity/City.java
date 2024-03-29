@@ -20,6 +20,7 @@ public class City {
     private String name;
 
     @NotNull
-    @Column(name = "wmo_code")
-    private Integer WMOcode;
+    @JoinColumn(name = "weather_station_wmo_code")
+    @ManyToOne
+    private WeatherStation weatherStation;
 }

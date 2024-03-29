@@ -20,11 +20,9 @@ public class WeatherMeasurement {
     @Column(name = "timestamp")
     private Timestamp timestamp;
 
-    @Column(name = "station_name")
-    private String stationName;
-
-    @Column(name = "wmo_code")
-    private Integer WMOcode;
+    @ManyToOne
+    @JoinColumn(name = "weather_station_wmo_code")
+    private WeatherStation weatherStation;
 
     @Column(name = "air_temperature")
     private Float airTemperature;
@@ -40,8 +38,8 @@ public class WeatherMeasurement {
         return new StringBuilder().append("----- Weather Measurement -----\n")
                 .append("ID: ").append(id).append("\n")
                 .append("Timestamp: ").append(timestamp).append("\n")
-                .append("Name: ").append(stationName).append("\n")
-                .append("WMO: ").append(WMOcode).append("\n")
+                .append("Name: ").append(weatherStation.getName()).append("\n")
+                .append("WMO: ").append(weatherStation.getWMOcode()).append("\n")
                 .append("Air temperature: ").append(airTemperature).append("\n")
                 .append("Wind Speed: ").append(windSpeed).append("\n")
                 .append("Phenomenon: ").append(phenomenon)

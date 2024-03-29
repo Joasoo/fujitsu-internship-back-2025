@@ -1,17 +1,23 @@
 --liquibase formatted sql
 
 --changeset Markus Joasoo:20-03-2024 Create initial tables
+
+CREATE TABLE IF NOT EXISTS weather_station (
+    wmo_code INTEGER PRIMARY KEY,
+    name CHARACTER VARYING NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS city (
     id BIGINT PRIMARY KEY,
     name CHARACTER VARYING NOT NULL,
-    wmo_code INTEGER NOT NULL
+    weather_station_wmo_code INTEGER NOT NULL,
+
+    CONSTRAINT fk_city_station_wmo_code FOREIGN KEY (weather_station_wmo_code) REFERENCES weather_station(wmo_code)
 );
 
 CREATE TABLE IF NOT EXISTS vehicle (
     id BIGINT PRIMARY KEY,
-    type CHARACTER VARYING NOT NULL,
-
-    CONSTRAINT ak_vehicle_type UNIQUE(type)
+    type CHARACTER VARYING NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS regional_base_fee (
@@ -54,11 +60,10 @@ CREATE TABLE IF NOT EXISTS work_prohibition (
 CREATE TABLE IF NOT EXISTS weather_measurement (
     id BIGINT PRIMARY KEY,
     timestamp TIMESTAMP NOT NULL,
-    station_name CHARACTER VARYING NOT NULL,
-    wmo_code INTEGER NOT NULL,
+    weather_station_wmo_code INTEGER NOT NULL,
     air_temperature DOUBLE PRECISION,
     wind_speed DOUBLE PRECISION,
     phenomenon CHARACTER VARYING,
 
-    CONSTRAINT ak_weather_measurement_timestamp_wmo_code UNIQUE (timestamp, wmo_code)
+    CONSTRAINT fk_weather_measurement_weather_station_wmo_code FOREIGN KEY (weather_station_wmo_code) REFERENCES weather_station(wmo_code)
 );

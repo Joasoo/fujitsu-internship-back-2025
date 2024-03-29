@@ -15,12 +15,12 @@ public class WorkProhibition {
     private Long id;
 
     @NotNull
-    @JoinColumn(name = "vehicle_id")
     @ManyToOne
+    @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
     @NotNull
-    @JoinColumn(name = "code_item")
     @ManyToOne
+    @JoinColumn(name = "code_item")
     private CodeItem codeItem;
 }
