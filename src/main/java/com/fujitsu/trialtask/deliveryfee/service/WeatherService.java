@@ -74,13 +74,13 @@ public class WeatherService {
         // Timestamp constructor requires time in milliseconds.
         final Timestamp timestamp = new Timestamp(observation.getTimeInSeconds() * 1000);
         final List<WeatherStationModel> stationModels = observation.getStations();
-        final Map<Integer, WeatherStation> requiredStations = getStationMap(stationRepository.findAll());  // K: WMO
+        final Map<Integer, WeatherStation> requiredStations = getStationMap(stationRepository.findAll());
 
         final List<WeatherMeasurement> measurements = new ArrayList<>();
         for (WeatherStationModel stationModel : stationModels) {
             int stationModelWMO = stationModel.getWMOcode();
             if (requiredStations.containsKey(stationModelWMO)) {
-                // Maps weather readings
+                // Maps air temp, wind speed, phenomenon to measurement.
                 final WeatherMeasurement measurement = weatherMapper.toEntity(stationModel);
                 measurement.setWeatherStation(requiredStations.get(stationModelWMO));
                 measurement.setTimestamp(timestamp);
@@ -90,8 +90,13 @@ public class WeatherService {
         return measurements;
     }
 
-    private Map<Integer, WeatherStation> getStationMap(List<WeatherStation> stations) {
-        Map<Integer, WeatherStation> stationMap = new HashMap<>();
+    /**
+     * Converts a list of WeatherStation entities into a Map of WeatherStation entities.
+     * @param stations List of WeatherStation entities
+     * @return Map(Key: Integer (WMO), Value: WeatherStation)
+     */
+    private Map<Integer, WeatherStation> getStationMap(final List<WeatherStation> stations) {
+        final Map<Integer, WeatherStation> stationMap = new HashMap<>();
         for (WeatherStation station : stations) {
             stationMap.put(station.getWMOcode(), station);
         }
