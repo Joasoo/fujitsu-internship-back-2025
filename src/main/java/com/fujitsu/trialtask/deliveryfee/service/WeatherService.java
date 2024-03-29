@@ -31,6 +31,12 @@ public class WeatherService {
     private final WeatherMeasurementMapper weatherMeasurementMapper;
     private final RestTemplate restTemplate;
 
+    /**
+     * Finds the latest weather measurement from a station (WMO).
+     * @param WMOcode wmo code of the station
+     * @return WeatherMeasurementDto
+     * @throws WeatherDataException Weather data for the station is not available in the database
+     */
     public WeatherMeasurementDto getLatestMeasurementFromStation(final Integer WMOcode) throws WeatherDataException {
         WeatherMeasurement measurement = weatherMeasurementRepository.findTopByWMOCodeOrderByTimestampDesc(WMOcode)
                 .orElseThrow(() -> new WeatherDataException("Weather data is not available", WMOcode));
@@ -50,7 +56,7 @@ public class WeatherService {
         weatherMeasurementRepository.saveAll(measurements);
     }
 
-    public WeatherObservationDto requestWeatherObservation() {
+    private WeatherObservationDto requestWeatherObservation() {
         final HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_XML));
 
@@ -62,7 +68,7 @@ public class WeatherService {
         return null;
     }
 
-    public List<WeatherMeasurement> ObservationDtoToWeatherMeasurements(final WeatherObservationDto observation) {
+    private List<WeatherMeasurement> ObservationDtoToWeatherMeasurements(final WeatherObservationDto observation) {
         // Timestamp constructor requires time in milliseconds.
         final Timestamp timestamp = new Timestamp(observation.getTimeInSeconds() * 1000);
         final List<WeatherStationDto> stations = observation.getStations();

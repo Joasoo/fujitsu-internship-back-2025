@@ -55,10 +55,7 @@ class DeliveryFeeApplicationTests {
 
     @Test
     void justTesting() {
-        given(cityRepository.findAll()).willReturn(cities);
-        WeatherObservationDto observation = service.requestWeatherObservation();
-        List<WeatherMeasurement> measurements = service.ObservationDtoToWeatherMeasurements(observation);
-        measurements.forEach(System.out::println);
+
     }
 
 }

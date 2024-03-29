@@ -27,6 +27,15 @@ public class DeliveryFeeService {
     private final WorkProhibitionRepository workProhibitionRepository;
     private final WeatherService weatherService;
 
+    /**
+     * Validates weather conditions for given vehicle. Calculates the base fee, extra fee and total fee for delivery
+     * based on city and vehicle.
+     * @param cityId vehicle id
+     * @param vehicleId city id
+     * @return DeliveryFeeDto(cityId, vehicleId, baseFee, extraFee, totalFee)
+     * @throws DeliveryFeeException Invalid city ID | Invalid vehicle ID | Unfit weather conditions for vehicle
+     * @throws WeatherDataException Weather data for the city's station is not available in the database
+     */
     public DeliveryFeeDto getDeliveryFee(final Long cityId, final Long vehicleId) throws DeliveryFeeException, WeatherDataException {
         if (!vehicleRepository.existsById(vehicleId)) {
             throw new DeliveryFeeException("Invalid vehicle ID");
