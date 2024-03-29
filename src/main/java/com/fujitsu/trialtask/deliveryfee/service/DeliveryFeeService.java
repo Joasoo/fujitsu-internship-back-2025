@@ -53,7 +53,7 @@ public class DeliveryFeeService {
         }
 
         final City city = cityRepository.findById(cityId).orElseThrow(
-                () -> new DeliveryFeeException("Invalid City ID")
+                () -> new DeliveryFeeException("Invalid city ID")
         );
         final WeatherMeasurementDto measurement = weatherService.getLatestMeasurementFromStation(city.getWeatherStation());
         final List<WeatherCode> weatherCodes = getWeatherCodes(measurement);
@@ -66,7 +66,13 @@ public class DeliveryFeeService {
         final BigDecimal baseFee = getBaseFeeAmount(cityId, vehicleId);
         final BigDecimal extraFee = getExtraFees(weatherCodeItems, vehicleId);
         final BigDecimal totalFee = baseFee.add(extraFee);
-        return new DeliveryFeeDto(cityId, vehicleId, baseFee, extraFee, totalFee);
+        return DeliveryFeeDto.builder()
+                .cityId(cityId)
+                .vehicleId(vehicleId)
+                .baseFee(baseFee)
+                .extraFee(extraFee)
+                .totalFee(totalFee)
+                .build();
     }
 
     private boolean unfitWeatherConditions(final Long vehicleId, final List<CodeItem> weatherCodes) {
@@ -156,7 +162,7 @@ public class DeliveryFeeService {
         if (rain) {
             return Optional.of(WeatherCode.WP_RAIN);
         } else if (snowOrFleet) {
-            return Optional.of(WeatherCode.WP_SNOW_FLEET);
+            return Optional.of(WeatherCode.WP_SNOW_SLEET);
         } else if (glazeOrHailOrThunder) {
             return Optional.of(WeatherCode.WP_GLAZE_HAIL_THUNDER);
         }

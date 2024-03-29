@@ -10,8 +10,8 @@ public enum WeatherCode {
     WS_TEN_TO_TWENTY,
     /** Wind speed above 20m/s. **/
     WS_ABOVE_TWENTY,
-    /** Weather phenomenon includes snow or fleet. **/
-    WP_SNOW_FLEET,
+    /** Weather phenomenon includes snow or sleet. **/
+    WP_SNOW_SLEET,
     /** Weather phenomenon includes rain. **/
     WP_RAIN,
     /** Weather phenomenon includes glaze, hail, or thunder. **/
