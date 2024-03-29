@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS regional_base_fee (
 
     CONSTRAINT fk_regional_base_fee_city_id FOREIGN KEY (city_id) REFERENCES city (id),
     CONSTRAINT fk_regional_base_fee_vehicle_id FOREIGN KEY (vehicle_id) REFERENCES vehicle (id),
+    CONSTRAINT ak_regional_base_fee_vehicle_id_city_id UNIQUE (vehicle_id, city_id),
     CONSTRAINT chk_regional_base_fee_fee_amount CHECK (fee_amount > 0)
 );
 
