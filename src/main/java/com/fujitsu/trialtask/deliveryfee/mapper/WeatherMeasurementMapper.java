@@ -9,5 +9,11 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface WeatherMeasurementMapper {
     WeatherMeasurementDto toDto(WeatherMeasurement entity);
+
+    /**
+     * Maps readings like air temperature etc. from requested XML station object.
+     * @param dto XML station object
+     * @return WeatherMeasurement
+     */
     WeatherMeasurement toEntity(WeatherStationModel dto);
 }

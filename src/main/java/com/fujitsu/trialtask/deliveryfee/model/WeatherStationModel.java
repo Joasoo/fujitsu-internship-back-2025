@@ -3,7 +3,9 @@ package com.fujitsu.trialtask.deliveryfee.model;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Data;
 
-
+/**
+ * Class for parsing XML station object.
+ */
 @Data
 public class WeatherStationModel {
     @JacksonXmlProperty(localName = "name")

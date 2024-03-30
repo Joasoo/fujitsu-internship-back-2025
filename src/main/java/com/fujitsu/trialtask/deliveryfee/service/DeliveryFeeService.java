@@ -64,7 +64,7 @@ public class DeliveryFeeService {
         }
 
         final BigDecimal baseFee = getBaseFeeAmount(cityId, vehicleId);
-        final BigDecimal extraFee = getExtraFees(weatherCodeItems, vehicleId);
+        final BigDecimal extraFee = getTotalExtraFeeAmount(weatherCodeItems, vehicleId);
         final BigDecimal totalFee = baseFee.add(extraFee);
         return DeliveryFeeDto.builder()
                 .cityId(cityId)
@@ -92,9 +92,9 @@ public class DeliveryFeeService {
         return baseFee.getFeeAmount();
     }
 
-    private BigDecimal getExtraFees(final List<CodeItem> weatherCodes, final Long vehicleId) {
+    private BigDecimal getTotalExtraFeeAmount(final List<CodeItem> codeItems, final Long vehicleId) {
         BigDecimal total = BigDecimal.ZERO;
-        for (CodeItem codeItem : weatherCodes) {
+        for (CodeItem codeItem : codeItems) {
             final Optional<ExtraFee> extraFee = extraFeeRepository.findByVehicleIdAndCodeItemCode(vehicleId, codeItem.getCode());
             if (extraFee.isPresent()) {
                 total = total.add(extraFee.get().getFeeAmount());

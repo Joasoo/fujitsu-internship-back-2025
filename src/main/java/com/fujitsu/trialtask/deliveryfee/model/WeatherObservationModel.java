@@ -7,6 +7,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Class for parsing XML observation object.
+ */
 @Data
 @JacksonXmlRootElement(localName = "observations")
 public class WeatherObservationModel {
