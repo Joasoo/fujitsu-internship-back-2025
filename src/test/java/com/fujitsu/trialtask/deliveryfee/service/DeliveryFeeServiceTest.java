@@ -190,7 +190,7 @@ public class DeliveryFeeServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideForBaseFeeTest")
-    void getDeliveryFee_NoExtraFees_CorrectDeliveryFeeDto(City city, Vehicle vehicle) {
+    void getDeliveryFee_NoExtraFeesFromWeather_CorrectDeliveryFeeDto(City city, Vehicle vehicle) {
         RegionalBaseFee baseFee = TestUtil.getRegionalBaseFee(vehicle, city);
         given(vehicleRepository.existsById(vehicle.getId())).willReturn(true);
         given(cityRepository.findById(city.getId())).willReturn(Optional.of(city));
