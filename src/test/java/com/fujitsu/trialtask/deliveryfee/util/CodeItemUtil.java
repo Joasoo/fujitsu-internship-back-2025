@@ -4,6 +4,7 @@ import com.fujitsu.trialtask.deliveryfee.entity.CodeItem;
 import com.fujitsu.trialtask.deliveryfee.util.enums.WeatherCode;
 
 public class CodeItemUtil {
+    private CodeItemUtil() {}
     public static final CodeItem AT_UNDER_MINUS_TEN = getCodeItem(WeatherCode.AT_UNDER_MINUS_TEN.name());
     public static final CodeItem AT_MINUS_TEN_TO_ZERO = getCodeItem(WeatherCode.AT_MINUS_TEN_TO_ZERO.name());
     public static final CodeItem WS_TEN_TO_TWENTY = getCodeItem(WeatherCode.WS_TEN_TO_TWENTY.name());
