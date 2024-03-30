@@ -9,11 +9,8 @@ import java.sql.Timestamp;
 import java.util.*;
 
 public class TestUtil {
-    private TestUtil() {
-    }
-
+    private TestUtil() {}
     private static long idCounter = 10000L;
-
 
     public static RegionalBaseFee getRegionalBaseFee(Vehicle vehicle, City city) {
         return RegionalBaseFee.builder()
@@ -51,7 +48,7 @@ public class TestUtil {
     }
 
     /**
-     * Used to request weather without any codes or a single code.
+     * Returns a weatherMeasurementDto without any special code(s) or with code(s).
      *
      * @param station weather station
      * @return normal weather dto
