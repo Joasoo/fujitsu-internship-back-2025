@@ -6,15 +6,14 @@ import com.fujitsu.trialtask.deliveryfee.util.enums.WeatherCode;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.Optional;
+import java.util.*;
 
 public class TestUtil {
-    private TestUtil() {}
-    private static long idCounter = 0L;
-
-    public static WorkProhibition getWorkProhibition(Vehicle vehicle, CodeItem codeItem) {
-        return new WorkProhibition(idCounter++, vehicle, codeItem);
+    private TestUtil() {
     }
+
+    private static long idCounter = 10000L;
+
 
     public static RegionalBaseFee getRegionalBaseFee(Vehicle vehicle, City city) {
         return RegionalBaseFee.builder()
@@ -25,43 +24,74 @@ public class TestUtil {
                 .build();
     }
 
-    public static Optional<ExtraFee> getExtraFee(Vehicle vehicle, CodeItem codeItem) {
-        Optional<BigDecimal> feeAmount = getExtraFeeAmount(vehicle, codeItem);
-        if (feeAmount.isEmpty()) {
-            return Optional.empty();
+    /**
+     * Return a map of Optional ExtraFees. Key is the CodeItem that is used to request an ExtraFee.
+     * Value is Optional.empty() if no extra fee is available for vehicle and code item combination.
+     * @param vehicle   vehicle
+     * @param codeItems code items
+     * @return Map of ExtraFees
+     */
+    public static Map<CodeItem, Optional<ExtraFee>> getExtraFees(Vehicle vehicle, List<CodeItem> codeItems) {
+        Map<CodeItem, Optional<ExtraFee>> fees = new HashMap<>();
+        for (CodeItem codeItem : codeItems) {
+            Optional<BigDecimal> feeAmount = getExtraFeeAmount(vehicle, codeItem);
+            if (feeAmount.isEmpty()) {
+                fees.put(codeItem, Optional.empty());
+            } else {
+                fees.put(codeItem, Optional.of(ExtraFee.builder()
+                        .id(idCounter++)
+                        .vehicle(vehicle)
+                        .codeItem(codeItem)
+                        .feeAmount(feeAmount.get())
+                        .build())
+                );
+            }
         }
-        return Optional.of(ExtraFee.builder()
-                .id(idCounter++)
-                .vehicle(vehicle)
-                .codeItem(codeItem)
-                .feeAmount(feeAmount.get())
-                .build());
+        return fees;
     }
 
-    public static WeatherMeasurementDto getWeatherMeasurementDto(WeatherStation station, WeatherCode... codes) {
+    /**
+     * Used to request weather without any codes or a single code.
+     *
+     * @param station weather station
+     * @return normal weather dto
+     */
+    public static WeatherMeasurementDto getWeatherMeasurementDto(WeatherStation station, CodeItem... codes) {
+        return getWeatherMeasurementDto(station, List.of(codes));
+    }
+
+    /**
+     * Returns a WeatherMeasurementDto with data according to provided codes.
+     *
+     * @param station Weather station
+     * @param codes   List of code items (weather codes)
+     * @return Corresponding WeatherMeasurementDto
+     */
+    public static WeatherMeasurementDto getWeatherMeasurementDto(WeatherStation station, List<CodeItem> codes) {
         float airTemperature = 10F;
         float windSpeed = 0F;
         String phenomenon = "";
-        for (WeatherCode code : codes) {
-            if (code.equals(WeatherCode.AT_UNDER_MINUS_TEN)) {
+        for (CodeItem codeItem : codes) {
+            String code = codeItem.getCode();
+            if (code.equals(WeatherCode.AT_UNDER_MINUS_TEN.name())) {
                 airTemperature = -20f;
             }
-            if (code.equals(WeatherCode.AT_MINUS_TEN_TO_ZERO)) {
+            if (code.equals(WeatherCode.AT_MINUS_TEN_TO_ZERO.name())) {
                 airTemperature = -5f;
             }
-            if (code.equals(WeatherCode.WS_ABOVE_TWENTY)) {
+            if (code.equals(WeatherCode.WS_ABOVE_TWENTY.name())) {
                 windSpeed = 30f;
             }
-            if (code.equals(WeatherCode.WS_TEN_TO_TWENTY)) {
+            if (code.equals(WeatherCode.WS_TEN_TO_TWENTY.name())) {
                 windSpeed = 15f;
             }
-            if (code.equals(WeatherCode.WP_SNOW_SLEET)) {
+            if (code.equals(WeatherCode.WP_SNOW_SLEET.name())) {
                 phenomenon = "snow";
             }
-            if (code.equals(WeatherCode.WP_RAIN)) {
+            if (code.equals(WeatherCode.WP_RAIN.name())) {
                 phenomenon = "rain";
             }
-            if (code.equals(WeatherCode.WP_GLAZE_HAIL_THUNDER)) {
+            if (code.equals(WeatherCode.WP_GLAZE_HAIL_THUNDER.name())) {
                 phenomenon = "thunder";
             }
         }
@@ -111,6 +141,12 @@ public class TestUtil {
         return BigDecimal.ZERO;
     }
 
+    /**
+     * Return Optional of extra fee amount if it is available for given vehicle and code, else Optional.empty()
+     * @param vehicle vehicle
+     * @param codeItem CodeItem tied to extra fee
+     * @return Optional of BigDecimal
+     */
     private static Optional<BigDecimal> getExtraFeeAmount(Vehicle vehicle, CodeItem codeItem) {
         String vehicleType = vehicle.getType().toLowerCase();
         String code = codeItem.getCode();

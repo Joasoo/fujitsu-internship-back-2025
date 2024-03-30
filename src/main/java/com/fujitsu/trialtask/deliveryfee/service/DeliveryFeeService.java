@@ -88,7 +88,7 @@ public class DeliveryFeeService {
 
     private BigDecimal getBaseFeeAmount(final Long cityId, final Long vehicleId) throws DeliveryFeeException {
         final RegionalBaseFee baseFee = baseFeeRepository.findByCityIdAndVehicleId(cityId, vehicleId)
-                .orElseThrow(() -> new DeliveryFeeException("This type of vehicle is not allowed in this city."));
+                .orElseThrow(() -> new DeliveryFeeException("This type of vehicle is not allowed in this city"));
         return baseFee.getFeeAmount();
     }
 
