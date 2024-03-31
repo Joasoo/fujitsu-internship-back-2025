@@ -132,7 +132,7 @@ public class TestUtil {
                 case "tartu":
                     return BigDecimal.valueOf(2.5);
                 case "pärnu":
-                    return BigDecimal.TWO;
+                    return BigDecimal.valueOf(2);
             }
         }
         return BigDecimal.ZERO;
