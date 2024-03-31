@@ -47,8 +47,8 @@ public class WeatherService {
                         .orElseThrow(() -> new WeatherDataException("Weather data is not available", station.getWMOcode()));
         return weatherMapper.toDto(measurement);
     }
-
-    @Scheduled(cron = "0 15 * * * *")
+    // 0 15 * * * *
+    @Scheduled(cron = "0 * * * * *")
     private void updateWeather() {
         final WeatherObservationModel observation = requestWeatherObservation();
         if (observation == null) {
@@ -86,13 +86,19 @@ public class WeatherService {
 
         final List<WeatherMeasurement> measurements = new ArrayList<>();
         for (WeatherStationModel stationModel : stationModels) {
-            int stationModelWMO = stationModel.getWMOcode();
-            if (requiredStations.containsKey(stationModelWMO)) {
-                // Maps air temp, wind speed, phenomenon to measurement.
-                final WeatherMeasurement measurement = weatherMapper.toEntity(stationModel);
-                measurement.setWeatherStation(requiredStations.get(stationModelWMO));
-                measurement.setTimestamp(timestamp);
-                measurements.add(measurement);
+            if (stationModel.getWMOcode() != null) {
+                int stationModelWMO = stationModel.getWMOcode();
+                if (requiredStations.containsKey(stationModelWMO)) {
+                    // Maps air temp, wind speed, phenomenon to measurement.
+                    final WeatherMeasurement measurement = weatherMapper.toEntity(stationModel);
+         /*           WeatherMeasurement measurement = new WeatherMeasurement();
+                    measurement.setAirTemperature(stationModel.getAirTemperature());
+                    measurement.setWindSpeed(stationModel.getWindSpeed());
+                    measurement.setPhenomenon(stationModel.getPhenomenon());*/
+                    measurement.setWeatherStation(requiredStations.get(stationModelWMO));
+                    measurement.setTimestamp(timestamp);
+                    measurements.add(measurement);
+                }
             }
         }
         return measurements;
