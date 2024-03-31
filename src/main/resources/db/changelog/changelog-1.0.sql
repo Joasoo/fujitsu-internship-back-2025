@@ -12,12 +12,15 @@ CREATE TABLE IF NOT EXISTS city (
     name CHARACTER VARYING NOT NULL,
     weather_station_wmo_code INTEGER NOT NULL,
 
-    CONSTRAINT fk_city_station_wmo_code FOREIGN KEY (weather_station_wmo_code) REFERENCES weather_station(wmo_code)
+    CONSTRAINT fk_city_station_wmo_code FOREIGN KEY (weather_station_wmo_code) REFERENCES weather_station(wmo_code),
+    CONSTRAINT ak_city_name_station_wmo_code UNIQUE (name, weather_station_wmo_code)
 );
 
 CREATE TABLE IF NOT EXISTS vehicle (
     id BIGINT PRIMARY KEY,
-    type CHARACTER VARYING NOT NULL
+    type CHARACTER VARYING NOT NULL,
+
+    CONSTRAINT ak_vehicle_type UNIQUE (type)
 );
 
 CREATE TABLE IF NOT EXISTS regional_base_fee (
@@ -55,7 +58,8 @@ CREATE TABLE IF NOT EXISTS work_prohibition (
     code_item CHARACTER VARYING NOT NULL,
 
     CONSTRAINT fk_work_prohibition_vehicle_id FOREIGN KEY (vehicle_id) REFERENCES vehicle(id),
-    CONSTRAINT fk_work_prohibition_code_item FOREIGN KEY (code_item) REFERENCES code_item(code)
+    CONSTRAINT fk_work_prohibition_code_item FOREIGN KEY (code_item) REFERENCES code_item(code),
+    CONSTRAINT ak_work_prohibition_vehicle_id_code_item UNIQUE (vehicle_id, code_item)
 );
 
 CREATE TABLE IF NOT EXISTS weather_measurement (
