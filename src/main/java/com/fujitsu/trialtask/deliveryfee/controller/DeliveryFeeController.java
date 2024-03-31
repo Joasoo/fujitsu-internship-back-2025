@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeliveryFeeController {
     private final DeliveryFeeService deliveryService;
 
+    /**
+     * Request a delivery fee calculation for a given vehicle in a given city.
+     * @param cityId id of the city
+     * @param vehicleId id of the vehicle
+     * @return Base fee, extra fee, total fee
+     */
     @GetMapping("/city/{cityId}/vehicle/{vehicleId}")
     public DeliveryFeeDto getDeliveryFee(@PathVariable("cityId") Long cityId, @PathVariable("vehicleId") Long vehicleId) {
         return deliveryService.getDeliveryFee(cityId, vehicleId);

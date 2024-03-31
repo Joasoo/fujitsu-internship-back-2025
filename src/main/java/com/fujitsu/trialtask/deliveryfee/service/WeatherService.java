@@ -47,8 +47,8 @@ public class WeatherService {
                         .orElseThrow(() -> new WeatherDataException("Weather data is not available", station.getWMOcode()));
         return weatherMapper.toDto(measurement);
     }
-    // 0 15 * * * *
-    @Scheduled(cron = "0 * * * * *")
+
+    @Scheduled(cron = "0 15 * * * *")
     private void updateWeather() {
         final WeatherObservationModel observation = requestWeatherObservation();
         if (observation == null) {
@@ -91,10 +91,6 @@ public class WeatherService {
                 if (requiredStations.containsKey(stationModelWMO)) {
                     // Maps air temp, wind speed, phenomenon to measurement.
                     final WeatherMeasurement measurement = weatherMapper.toEntity(stationModel);
-         /*           WeatherMeasurement measurement = new WeatherMeasurement();
-                    measurement.setAirTemperature(stationModel.getAirTemperature());
-                    measurement.setWindSpeed(stationModel.getWindSpeed());
-                    measurement.setPhenomenon(stationModel.getPhenomenon());*/
                     measurement.setWeatherStation(requiredStations.get(stationModelWMO));
                     measurement.setTimestamp(timestamp);
                     measurements.add(measurement);
