@@ -36,6 +36,7 @@ public class WeatherService {
 
     /**
      * Finds the latest weather measurement from a station.
+     *
      * @param station WeatherStation entity
      * @return WeatherMeasurementDto
      * @throws WeatherDataException Weather data for the station is not available in the database
@@ -43,7 +44,7 @@ public class WeatherService {
     public WeatherMeasurementDto getLatestMeasurementFromStation(final WeatherStation station) throws WeatherDataException {
         WeatherMeasurement measurement =
                 weatherRepository.findTopByWeatherStationWMOcodeOrderByTimestampDesc(station.getWMOcode())
-                .orElseThrow(() -> new WeatherDataException("Weather data is not available", station.getWMOcode()));
+                        .orElseThrow(() -> new WeatherDataException("Weather data is not available", station.getWMOcode()));
         return weatherMapper.toDto(measurement);
     }
 
@@ -70,6 +71,13 @@ public class WeatherService {
         }
     }
 
+    /**
+     * Extracts weather data as WeatherMeasurement objects from the observation.
+     * Only extracts data for stations that are present in the repository.
+     *
+     * @param observation WeatherObservationModel object from the HTTP request
+     * @return List of extracted weather data objects (WeatherMeasurement)
+     */
     private List<WeatherMeasurement> ObservationDtoToWeatherMeasurements(final WeatherObservationModel observation) {
         // Timestamp constructor requires time in milliseconds.
         final Timestamp timestamp = new Timestamp(observation.getTimeInSeconds() * 1000);
@@ -92,8 +100,9 @@ public class WeatherService {
 
     /**
      * Converts a list of WeatherStation entities into a Map of WeatherStation entities.
+     *
      * @param stations List of WeatherStation entities
-     * @return Map(Key: Integer (WMO), Value: WeatherStation)
+     * @return Map(Key : Integer ( WMO), Value: WeatherStation)
      */
     private Map<Integer, WeatherStation> getStationMap(final List<WeatherStation> stations) {
         final Map<Integer, WeatherStation> stationMap = new HashMap<>();

@@ -171,10 +171,10 @@ public class DeliveryFeeService {
     }
 
     private List<CodeItem> getCodeItems (final List<String> codes) {
-        List<CodeItem> codeItems = new ArrayList<>();
+        final List<CodeItem> codeItems = new ArrayList<>();
         for (String code : codes) {
             try {
-                CodeItem item = codeItemRepository.findByCode(code).orElseThrow(() -> new CodeItemException(code));
+                final CodeItem item = codeItemRepository.findByCode(code).orElseThrow(() -> new CodeItemException(code));
                 codeItems.add(item);
             } catch (CodeItemException e) {
                 log.error(e.getMessage(), e);
