@@ -8,7 +8,7 @@ group = 'com.fujitsu.trialtask'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '21'
+    sourceCompatibility = '17'
 }
 
 configurations {
@@ -22,16 +22,17 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
     runtimeOnly 'com.h2database:h2'
-    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     implementation 'org.springframework.boot:spring-boot-starter-web:3.2.3'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.liquibase:liquibase-core'
+    implementation 'org.liquibase:liquibase-core:4.27.0'
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.4'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
