@@ -30,7 +30,7 @@ Build the project (this will also download the necessary dependencies):
 
 `./gradlew build`
 
-Run the application (liquibase will setup database):
+Run the application (liquibase should setup database):
 
 `./gradlew bootRun`
 
