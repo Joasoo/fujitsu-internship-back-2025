@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 public class WeatherMeasurementDto {
     private Long id;
     private Timestamp timestamp;
-    private WeatherStation weatherStation;
+    private WeatherStation weatherStation;  // Should be WeatherStationDto
     private Float airTemperature;
     private Float windSpeed;
     private String phenomenon;
