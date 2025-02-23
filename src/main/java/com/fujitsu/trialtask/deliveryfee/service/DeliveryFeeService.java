@@ -156,12 +156,12 @@ public class DeliveryFeeService {
 
         final String phenomenon = measurement.getPhenomenon().toLowerCase();
         final boolean rain = phenomenon.contains("rain");
-        final boolean snowOrFleet = phenomenon.matches(".*fleet.*|.*snow.*");
+        final boolean snowOrSleet = phenomenon.matches(".*sleet.*|.*snow.*");
         final boolean glazeOrHailOrThunder = phenomenon.matches(".*glaze.*|.*hail.*|.*thunder.*");
 
         if (rain) {
             return Optional.of(WeatherCode.WP_RAIN);
-        } else if (snowOrFleet) {
+        } else if (snowOrSleet) {
             return Optional.of(WeatherCode.WP_SNOW_SLEET);
         } else if (glazeOrHailOrThunder) {
             return Optional.of(WeatherCode.WP_GLAZE_HAIL_THUNDER);
