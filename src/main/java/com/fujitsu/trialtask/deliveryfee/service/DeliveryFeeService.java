@@ -10,6 +10,7 @@ import com.fujitsu.trialtask.deliveryfee.repository.VehicleRepository;
 import com.fujitsu.trialtask.deliveryfee.util.exception.DeliveryFeeException;
 import com.fujitsu.trialtask.deliveryfee.util.exception.WeatherDataException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DeliveryFeeService {
     private final VehicleRepository vehicleRepository;
     private final CityRepository cityRepository;
@@ -55,7 +57,9 @@ public class DeliveryFeeService {
             throw new DeliveryFeeException("Usage of selected vehicle type is forbidden");
         }
 
-        BigDecimal baseFee = baseFeeService.getBaseFee(cityId, vehicleId).getFeeAmount();
+        BigDecimal baseFee = baseFeeService.getBaseFee(cityId, vehicleId).orElseThrow(
+                () -> new DeliveryFeeException("This type of vehicle is not allowed in this city")
+        ).getFeeAmount();
         BigDecimal extraFee =
                 getTotalExtraFeeAmount(extraFeeService.getWeatherExtraFees(weatherCodes, vehicleId));
         BigDecimal totalFee = baseFee.add(extraFee);

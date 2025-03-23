@@ -43,7 +43,7 @@ public class WeatherService {
      * @return WeatherMeasurementDto
      * @throws WeatherDataException Weather data for the station is not available in the database
      */
-    public WeatherMeasurementDto getLatestMeasurementFromStation(final WeatherStation station) throws WeatherDataException {
+    public WeatherMeasurementDto getLatestMeasurementFromStation(WeatherStation station) throws WeatherDataException {
         WeatherMeasurement measurement =
                 weatherRepository.findTopByWeatherStationWMOcodeOrderByTimestampDesc(station.getWMOcode())
                         .orElseThrow(() -> new WeatherDataException("Weather data is not available", station.getWMOcode()));
@@ -52,11 +52,11 @@ public class WeatherService {
 
     @Scheduled(cron = "${weather.service.cron-expression}")
     private void updateWeather() {
-        final WeatherObservationModel observation = requestWeatherObservation();
+        WeatherObservationModel observation = requestWeatherObservation();
         if (observation == null) {
             throw new WeatherRequestException("Weather observation from request is null at " + LocalDateTime.now());
         }
-        final List<WeatherMeasurement> measurements = ObservationDtoToWeatherMeasurements(observation);
+        List<WeatherMeasurement> measurements = ObservationDtoToWeatherMeasurements(observation);
         if (measurements.isEmpty()) {
             throw new WeatherRequestException("Weather observation from request does not contain measurements at" + LocalDateTime.now());
         }
@@ -64,7 +64,7 @@ public class WeatherService {
     }
 
     private WeatherObservationModel requestWeatherObservation() {
-        final HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_XML));
         try {
             return restTemplate.getForObject(weatherRequestUrl, WeatherObservationModel.class, headers);
@@ -80,19 +80,19 @@ public class WeatherService {
      * @param observation WeatherObservationModel object from the HTTP request
      * @return List of extracted weather data objects (WeatherMeasurement)
      */
-    private List<WeatherMeasurement> ObservationDtoToWeatherMeasurements(final WeatherObservationModel observation) {
+    private List<WeatherMeasurement> ObservationDtoToWeatherMeasurements(WeatherObservationModel observation) {
         // Timestamp constructor requires time in milliseconds.
-        final Timestamp timestamp = new Timestamp(observation.getTimeInSeconds() * 1000);
-        final List<WeatherStationModel> stationModels = observation.getStations();
-        final Map<Integer, WeatherStation> requiredStations = getStationMap(stationRepository.findAll());
+        Timestamp timestamp = new Timestamp(observation.getTimeInSeconds() * 1000);
+        List<WeatherStationModel> stationModels = observation.getStations();
+        Map<Integer, WeatherStation> requiredStations = getStationMap(stationRepository.findAll());
 
-        final List<WeatherMeasurement> measurements = new ArrayList<>();
+        List<WeatherMeasurement> measurements = new ArrayList<>();
         for (WeatherStationModel stationModel : stationModels) {
             if (stationModel.getWMOcode() != null) {
                 int stationModelWMO = stationModel.getWMOcode();
                 if (requiredStations.containsKey(stationModelWMO)) {
                     // Maps air temp, wind speed, phenomenon to measurement.
-                    final WeatherMeasurement measurement = weatherMapper.toEntity(stationModel);
+                    WeatherMeasurement measurement = weatherMapper.toEntity(stationModel);
                     measurement.setWeatherStation(requiredStations.get(stationModelWMO));
                     measurement.setTimestamp(timestamp);
                     measurements.add(measurement);
@@ -108,8 +108,8 @@ public class WeatherService {
      * @param stations List of WeatherStation entities
      * @return Map(Key : Integer ( WMO), Value: WeatherStation)
      */
-    private Map<Integer, WeatherStation> getStationMap(final List<WeatherStation> stations) {
-        final Map<Integer, WeatherStation> stationMap = new HashMap<>();
+    private Map<Integer, WeatherStation> getStationMap(List<WeatherStation> stations) {
+        Map<Integer, WeatherStation> stationMap = new HashMap<>();
         for (WeatherStation station : stations) {
             stationMap.put(station.getWMOcode(), station);
         }
