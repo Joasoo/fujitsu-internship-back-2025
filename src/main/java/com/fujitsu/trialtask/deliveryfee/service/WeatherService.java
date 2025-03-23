@@ -8,10 +8,10 @@ import com.fujitsu.trialtask.deliveryfee.entity.WeatherMeasurement;
 import com.fujitsu.trialtask.deliveryfee.mapper.WeatherMeasurementMapper;
 import com.fujitsu.trialtask.deliveryfee.repository.WeatherMeasurementRepository;
 import com.fujitsu.trialtask.deliveryfee.repository.WeatherStationRepository;
-import com.fujitsu.trialtask.deliveryfee.util.constants.RequestURL;
 import com.fujitsu.trialtask.deliveryfee.util.exception.WeatherDataException;
 import com.fujitsu.trialtask.deliveryfee.util.exception.WeatherRequestException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,6 +33,8 @@ public class WeatherService {
     private final WeatherStationRepository stationRepository;
     private final WeatherMeasurementMapper weatherMapper;
     private final RestTemplate restTemplate;
+    @Value("${weather.service.request-url}")
+    private String weatherRequestUrl;
 
     /**
      * Finds the latest weather measurement from a station.
@@ -48,7 +50,7 @@ public class WeatherService {
         return weatherMapper.toDto(measurement);
     }
 
-    @Scheduled(cron = "0 15 * * * *")
+    @Scheduled(cron = "${weather.service.cron-expression}")
     private void updateWeather() {
         final WeatherObservationModel observation = requestWeatherObservation();
         if (observation == null) {
@@ -65,7 +67,7 @@ public class WeatherService {
         final HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_XML));
         try {
-            return restTemplate.getForObject(RequestURL.WEATHER_OBSERVATION, WeatherObservationModel.class, headers);
+            return restTemplate.getForObject(weatherRequestUrl, WeatherObservationModel.class, headers);
         } catch (RestClientException e) {
             throw new WeatherRequestException("An error has occurred when attempting restTemplate.getForObject()", e.getCause());
         }
