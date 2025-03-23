@@ -2,7 +2,6 @@ package com.fujitsu.trialtask.deliveryfee.util;
 
 import com.fujitsu.trialtask.deliveryfee.dto.WeatherMeasurementDto;
 import com.fujitsu.trialtask.deliveryfee.entity.*;
-import com.fujitsu.trialtask.deliveryfee.util.enums.WeatherCode;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;

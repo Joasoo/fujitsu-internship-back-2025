@@ -1,7 +1,6 @@
 package com.fujitsu.trialtask.deliveryfee.util;
 
 import com.fujitsu.trialtask.deliveryfee.entity.CodeItem;
-import com.fujitsu.trialtask.deliveryfee.util.enums.WeatherCode;
 
 public class CodeItemUtil {
     private CodeItemUtil() {}

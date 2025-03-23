@@ -1,4 +1,4 @@
-package com.fujitsu.trialtask.deliveryfee.util.enums;
+package com.fujitsu.trialtask.deliveryfee.util;
 
 /** Codes for different weather conditions. **/
 public enum WeatherCode {
