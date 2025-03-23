@@ -20,11 +20,11 @@ import java.util.List;
 public class DeliveryFeeService {
     private final VehicleRepository vehicleRepository;
     private final CityRepository cityRepository;
-    private final CodeItemService codeItemService;
+    private final SevereWeatherConditionService weatherConditionService;
     private final WeatherService weatherService;
     private final WorkProhibitionService prohibitionService;
     private final RegionalBaseFeeService baseFeeService;
-    private final WeatherExtraFeeService weatherExtraFeeService;
+    private final ExtraFeeService extraFeeService;
 
     /**
      * Validates weather conditions for given vehicle. Calculates the base fee, extra fee and total fee for delivery
@@ -46,7 +46,7 @@ public class DeliveryFeeService {
         );
 
         WeatherMeasurementDto measurementDto = weatherService.getLatestMeasurementFromStation(city.getWeatherStation());
-        List<String> weatherCodes = codeItemService.getCodeItemsFromWeatherMeasurementDto(measurementDto)
+        List<String> weatherCodes = weatherConditionService.getCodeItemsFromWeatherMeasurementDto(measurementDto)
                 .stream()
                 .map(CodeItem::getCode)
                 .toList();
@@ -57,7 +57,7 @@ public class DeliveryFeeService {
 
         BigDecimal baseFee = baseFeeService.getBaseFee(cityId, vehicleId).getFeeAmount();
         BigDecimal extraFee =
-                getTotalExtraFeeAmount(weatherExtraFeeService.getExtraFees(weatherCodes, vehicleId));
+                getTotalExtraFeeAmount(extraFeeService.getWeatherExtraFees(weatherCodes, vehicleId));
         BigDecimal totalFee = baseFee.add(extraFee);
 
         return DeliveryFeeDto.builder()

@@ -81,24 +81,25 @@ CREATE TABLE IF NOT EXISTS weather_measurement
     CONSTRAINT fk_weather_measurement_weather_station_wmo_code FOREIGN KEY (weather_station_wmo_code) REFERENCES weather_station (wmo_code)
 );
 
-CREATE TABLE IF NOT EXISTS weather_condition
+CREATE TABLE IF NOT EXISTS severe_weather_condition
 (
-    id              BIGINT PRIMARY KEY,
+    id              BIGSERIAL PRIMARY KEY,
     code_item       CHARACTER VARYING NOT NULL,
     min_measurement DOUBLE PRECISION,
     max_measurement DOUBLE PRECISION,
 
-    CONSTRAINT fk_weather_condition_code_item FOREIGN KEY (code_item) REFERENCES code_item (code),
-    CONSTRAINT ak_weather_condition_code_item UNIQUE (code_item)
+    CONSTRAINT fk_severe_weather_condition_code_item FOREIGN KEY (code_item) REFERENCES code_item (code),
+    CONSTRAINT ak_severe_weather_condition_code_item UNIQUE (code_item)
 
 );
 
 CREATE TABLE IF NOT EXISTS weather_phenomenon
 (
-    weather_condition_id  BIGINT NOT NULL,
+    severe_weather_condition_id  BIGINT NOT NULL,
     phenomenon CHARACTER VARYING NOT NULL,
-    CONSTRAINT pk_weather_phenomenon PRIMARY KEY (weather_condition_id, phenomenon),
-    CONSTRAINT fk_weather_phenomenon_code_item FOREIGN KEY (weather_condition_id) REFERENCES weather_condition (id)
+    CONSTRAINT pk_weather_phenomenon PRIMARY KEY (severe_weather_condition_id, phenomenon),
+    CONSTRAINT fk_weather_phenomenon_severe_weather_condition_id
+    FOREIGN KEY (severe_weather_condition_id) REFERENCES severe_weather_condition (id)
 );
 
 INSERT INTO weather_station (wmo_code, name)
@@ -126,22 +127,23 @@ VALUES ('AT_UNDER_MINUS_TEN', 'AT'),
        ('WP_RAIN', 'WP'),
        ('WP_GLAZE_HAIL_THUNDER', 'WP');
 
-INSERT INTO weather_condition (id, code_item, min_measurement, max_measurement)
-VALUES (1, 'AT_UNDER_MINUS_TEN', null, -10),
-       (2, 'AT_MINUS_TEN_TO_ZERO', -10, 0),
-       (3, 'WS_TEN_TO_TWENTY', 10, 20),
-       (4, 'WS_ABOVE_TWENTY', 20, null),
-       (5, 'WP_SNOW_SLEET', null, null),
-       (6, 'WP_RAIN', null, null),
-       (7, 'WP_GLAZE_HAIL_THUNDER', null, null);
+INSERT INTO severe_weather_condition (code_item, min_measurement, max_measurement)
+VALUES ('AT_UNDER_MINUS_TEN', null, -10),
+       ('AT_MINUS_TEN_TO_ZERO', -10, 0),
+       ('WS_TEN_TO_TWENTY', 10, 20),
+       ('WS_ABOVE_TWENTY', 20, null),
+       ('WP_SNOW_SLEET', null, null),
+       ('WP_RAIN', null, null),
+       ('WP_GLAZE_HAIL_THUNDER', null, null);
 
-INSERT INTO weather_phenomenon (weather_condition_id, phenomenon)
-VALUES (5, 'snow'),
-       (5, 'sleet'),
-       (6, 'rain'),
-       (7, 'glaze'),
-       (7, 'hail'),
-       (7, 'thunder');
+INSERT INTO weather_phenomenon (severe_weather_condition_id, phenomenon)
+VALUES
+    ((SELECT id FROM severe_weather_condition WHERE code_item = 'WP_SNOW_SLEET'), 'snow'),
+    ((SELECT id FROM severe_weather_condition WHERE code_item = 'WP_SNOW_SLEET'), 'sleet'),
+    ((SELECT id FROM severe_weather_condition WHERE code_item = 'WP_RAIN'), 'rain'),
+    ((SELECT id FROM severe_weather_condition WHERE code_item = 'WP_GLAZE_HAIL_THUNDER'), 'glaze'),
+    ((SELECT id FROM severe_weather_condition WHERE code_item = 'WP_GLAZE_HAIL_THUNDER'), 'hail'),
+    ((SELECT id FROM severe_weather_condition WHERE code_item = 'WP_GLAZE_HAIL_THUNDER'), 'thunder');
 
 INSERT INTO work_prohibition (vehicle_id, code_item)
 VALUES (3, 'WS_ABOVE_TWENTY'),

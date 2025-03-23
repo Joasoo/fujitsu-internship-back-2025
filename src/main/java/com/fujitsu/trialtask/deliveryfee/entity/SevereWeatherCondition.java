@@ -14,8 +14,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "weather_condition")
-public class WeatherCondition {
+@Table(name = "severe_weather_condition")
+public class SevereWeatherCondition {
     @Id
     @Column(name = "id")
     private Long id;
@@ -33,7 +33,7 @@ public class WeatherCondition {
 
     /**Only one of the phenomenons has to apply (OR operator)**/
     @ElementCollection
-    @CollectionTable(name = "weather_phenomenon", joinColumns = @JoinColumn(name = "weather_condition_id"))
+    @CollectionTable(name = "weather_phenomenon", joinColumns = @JoinColumn(name = "severe_weather_condition_id"))
     @Column(name = "phenomenon")
-    private List<String> phenomenons;
+    private List<String> phenomena;
 }

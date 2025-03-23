@@ -2,8 +2,8 @@ package com.fujitsu.trialtask.deliveryfee.service;
 
 import com.fujitsu.trialtask.deliveryfee.dto.WeatherMeasurementDto;
 import com.fujitsu.trialtask.deliveryfee.entity.CodeItem;
-import com.fujitsu.trialtask.deliveryfee.entity.WeatherCondition;
-import com.fujitsu.trialtask.deliveryfee.repository.WeatherConditionRepository;
+import com.fujitsu.trialtask.deliveryfee.entity.SevereWeatherCondition;
+import com.fujitsu.trialtask.deliveryfee.repository.SevereWeatherConditionRepository;
 import com.fujitsu.trialtask.deliveryfee.util.enums.CodeClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,8 +13,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CodeItemService {
-    private final WeatherConditionRepository weatherConditionRepository;
+public class SevereWeatherConditionService {
+    private final SevereWeatherConditionRepository weatherConditionRepository;
 
     public List<CodeItem> getCodeItemsFromWeatherMeasurementDto(WeatherMeasurementDto measurementDto) {
         List<CodeItem> items = new ArrayList<>();
@@ -29,10 +29,10 @@ public class CodeItemService {
             return List.of();
         }
 
-        List<WeatherCondition> allConditions =
+        List<SevereWeatherCondition> allConditions =
                 weatherConditionRepository.findAllByCodeItemCodeClass(CodeClass.WP.name());
-        List<WeatherCondition> conditions = allConditions.stream()
-                .filter(r -> r.getPhenomenons()
+        List<SevereWeatherCondition> conditions = allConditions.stream()
+                .filter(r -> r.getPhenomena()
                         .stream()
                         .anyMatch(p -> phenomenon.toLowerCase().contains(p.toLowerCase())))
                 .toList();
@@ -45,13 +45,13 @@ public class CodeItemService {
             return List.of();
         }
 
-        List<WeatherCondition> conditions =
+        List<SevereWeatherCondition> conditions =
                 weatherConditionRepository.findAllByCodeItemCodeClassAndMeasurement(codeClass.name(), measurement);
 
         return conditionsToCodeItems(conditions);
     }
 
-    private List<CodeItem> conditionsToCodeItems(List<WeatherCondition> conditions) {
-        return conditions.stream().map(WeatherCondition::getCodeItem).toList();
+    private List<CodeItem> conditionsToCodeItems(List<SevereWeatherCondition> conditions) {
+        return conditions.stream().map(SevereWeatherCondition::getCodeItem).toList();
     }
 }
