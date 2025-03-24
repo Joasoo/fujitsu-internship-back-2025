@@ -150,7 +150,7 @@ public class DeliveryFeeServiceTest {
         given(cityRepository.findById(tallinn.getId())).willReturn(Optional.of(tallinn));
         given(weatherService.getLatestMeasurementFromStation(tallinn.getWeatherStation())).willReturn(weather);
         given(weatherConditionService.getCodeItemsFromWeatherMeasurementDto(weather)).willReturn(List.of(codeItem));
-        given(prohibitionService.findWeatherProhibitionForVehicle(List.of(codeItem.getCode()), vehicle.getId()))
+        given(prohibitionService.findWeatherProhibitionForVehicle(List.of(codeItem), vehicle.getId()))
                 .willReturn(Optional.of(prohibition));
 
         // when
@@ -161,7 +161,7 @@ public class DeliveryFeeServiceTest {
         then(vehicleRepository).should().existsById(vehicle.getId());
         then(cityRepository).should().findById(tallinn.getId());
         then(weatherService).should().getLatestMeasurementFromStation(tallinn.getWeatherStation());
-        then(prohibitionService).should().findWeatherProhibitionForVehicle(List.of(codeItem.getCode()), vehicle.getId());
+        then(prohibitionService).should().findWeatherProhibitionForVehicle(List.of(codeItem), vehicle.getId());
         assertEquals("Usage of selected vehicle type is forbidden", thrown.getMessage());
     }
 
@@ -414,7 +414,7 @@ public class DeliveryFeeServiceTest {
         DeliveryFeeDto result = deliveryService.getDeliveryFee(tallinn.getId(), vehicle.getId());
 
         // then
-        verifyMockInteractions(vehicle, codeItems, weather, extraFees);
+        verifyMockInteractions(vehicle, codeItems, weather);
         DeliveryFeeDto expected = getExpectedDeliveryFeeDto(vehicle, baseFee, extraFees);
         assertDeliveryFeeDto(expected, result);
     }
@@ -426,16 +426,16 @@ public class DeliveryFeeServiceTest {
         given(weatherService.getLatestMeasurementFromStation(tallinn.getWeatherStation())).willReturn(weather);
         given(weatherConditionService.getCodeItemsFromWeatherMeasurementDto(weather)).willReturn(codeItems);
         given(baseFeeService.getBaseFee(tallinn.getId(), vehicle.getId())).willReturn(Optional.of(baseFee));
-        given(extraFeeService.getWeatherExtraFees(CodeItemUtil.asStrings(codeItems), vehicle.getId())).willReturn(extraFees);
+        given(extraFeeService.getWeatherExtraFees(codeItems, vehicle.getId())).willReturn(extraFees);
     }
 
-    private void verifyMockInteractions(Vehicle vehicle, List<CodeItem> codeItems, WeatherMeasurementDto weather, List<ExtraFee> extraFees) {
+    private void verifyMockInteractions(Vehicle vehicle, List<CodeItem> codeItems, WeatherMeasurementDto weather) {
         then(vehicleRepository).should().existsById(vehicle.getId());
         then(cityRepository).should().findById(tallinn.getId());
         then(weatherService).should().getLatestMeasurementFromStation(tallinn.getWeatherStation());
         then(weatherConditionService).should().getCodeItemsFromWeatherMeasurementDto(weather);
         then(baseFeeService).should().getBaseFee(tallinn.getId(), vehicle.getId());
-        then(extraFeeService).should().getWeatherExtraFees(CodeItemUtil.asStrings(codeItems), vehicle.getId());
+        then(extraFeeService).should().getWeatherExtraFees(codeItems, vehicle.getId());
     }
 
     private DeliveryFeeDto getExpectedDeliveryFeeDto(Vehicle vehicle, RegionalBaseFee baseFee, List<ExtraFee> extraFees) {

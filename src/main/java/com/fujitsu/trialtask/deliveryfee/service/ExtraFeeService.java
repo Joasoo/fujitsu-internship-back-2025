@@ -1,6 +1,7 @@
 package com.fujitsu.trialtask.deliveryfee.service;
 
 
+import com.fujitsu.trialtask.deliveryfee.entity.CodeItem;
 import com.fujitsu.trialtask.deliveryfee.entity.ExtraFee;
 import com.fujitsu.trialtask.deliveryfee.repository.ExtraFeeRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.List;
 public class ExtraFeeService {
     private final ExtraFeeRepository extraFeeRepository;
 
-    public List<ExtraFee> getWeatherExtraFees(List<String> weatherCodes, Long vehicleId) {
-        return extraFeeRepository.findAllByVehicleIdAndCodeItemCodeIn(vehicleId, weatherCodes);
+    public List<ExtraFee> getWeatherExtraFees(List<CodeItem> weatherCodes, Long vehicleId) {
+        return extraFeeRepository.findAllByVehicleIdAndCodeItemIn(vehicleId, weatherCodes);
     }
 }

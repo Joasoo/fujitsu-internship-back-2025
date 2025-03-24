@@ -46,20 +46,16 @@ public class DeliveryFeeService {
         );
 
         WeatherMeasurementDto measurementDto = weatherService.getLatestMeasurementFromStation(city.getWeatherStation());
-        List<String> weatherCodes = weatherConditionService.getCodeItemsFromWeatherMeasurementDto(measurementDto)
-                .stream()
-                .map(CodeItem::getCode)
-                .toList();
+        List<CodeItem> weatherCodes = weatherConditionService.getCodeItemsFromWeatherMeasurementDto(measurementDto);
 
         if (prohibitionService.findWeatherProhibitionForVehicle(weatherCodes, vehicleId).isPresent()) {
             throw new DeliveryFeeException("Usage of selected vehicle type is forbidden");
         }
 
         BigDecimal baseFee = baseFeeService.getBaseFee(cityId, vehicleId).orElseThrow(
-                () -> new DeliveryFeeException("This type of vehicle is not allowed in this city")
-        ).getFeeAmount();
-        BigDecimal extraFee =
-                getTotalExtraFeeAmount(extraFeeService.getWeatherExtraFees(weatherCodes, vehicleId));
+                () -> new DeliveryFeeException("This type of vehicle is not allowed in this city"))
+                .getFeeAmount();
+        BigDecimal extraFee = getTotalExtraFeeAmount(extraFeeService.getWeatherExtraFees(weatherCodes, vehicleId));
         BigDecimal totalFee = baseFee.add(extraFee);
 
         return DeliveryFeeDto.builder()

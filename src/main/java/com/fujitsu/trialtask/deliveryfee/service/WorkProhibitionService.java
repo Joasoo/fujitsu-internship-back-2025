@@ -1,6 +1,7 @@
 package com.fujitsu.trialtask.deliveryfee.service;
 
 
+import com.fujitsu.trialtask.deliveryfee.entity.CodeItem;
 import com.fujitsu.trialtask.deliveryfee.entity.WorkProhibition;
 import com.fujitsu.trialtask.deliveryfee.repository.WorkProhibitionRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.Optional;
 public class WorkProhibitionService {
     private final WorkProhibitionRepository workProhibitionRepository;
 
-    public Optional<WorkProhibition> findWeatherProhibitionForVehicle(List<String> weatherCodes, Long vehicleId) {
-        return workProhibitionRepository.findByVehicleIdAndCodeItemCodeIn(vehicleId, weatherCodes);
+    public Optional<WorkProhibition> findWeatherProhibitionForVehicle(List<CodeItem> weatherCodes, Long vehicleId) {
+        return workProhibitionRepository.findByVehicleIdAndCodeItemIn(vehicleId, weatherCodes);
     }
 }
