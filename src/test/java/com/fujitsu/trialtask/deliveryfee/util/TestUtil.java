@@ -1,6 +1,7 @@
 package com.fujitsu.trialtask.deliveryfee.util;
 
 import com.fujitsu.trialtask.deliveryfee.dto.WeatherMeasurementDto;
+import com.fujitsu.trialtask.deliveryfee.dto.WeatherStationDto;
 import com.fujitsu.trialtask.deliveryfee.entity.*;
 
 import java.math.BigDecimal;
@@ -8,7 +9,9 @@ import java.sql.Timestamp;
 import java.util.*;
 
 public class TestUtil {
-    private TestUtil() {}
+    private TestUtil() {
+    }
+
     private static long idCounter = 10000L;
 
     public static RegionalBaseFee getRegionalBaseFee(Vehicle vehicle, City city) {
@@ -21,27 +24,22 @@ public class TestUtil {
     }
 
     /**
-     * Return a map of Optional ExtraFees. Key is the CodeItem that is used to request an ExtraFee.
-     * Value is Optional.empty() if no extra fee is available for vehicle and code item combination.
+     * Returns all necessary extra fees for given vehicle based on weather conditions (codeItems).
+     *
      * @param vehicle   vehicle
      * @param codeItems code items
-     * @return Map of ExtraFees
+     * @return List of ExtraFees
      */
-    public static Map<CodeItem, Optional<ExtraFee>> getExtraFees(Vehicle vehicle, List<CodeItem> codeItems) {
-        Map<CodeItem, Optional<ExtraFee>> fees = new HashMap<>();
+    public static List<ExtraFee> getExtraFees(Vehicle vehicle, List<CodeItem> codeItems) {
+        List<ExtraFee> fees = new ArrayList<>();
         for (CodeItem codeItem : codeItems) {
             Optional<BigDecimal> feeAmount = getExtraFeeAmount(vehicle, codeItem);
-            if (feeAmount.isEmpty()) {
-                fees.put(codeItem, Optional.empty());
-            } else {
-                fees.put(codeItem, Optional.of(ExtraFee.builder()
-                        .id(idCounter++)
-                        .vehicle(vehicle)
-                        .codeItem(codeItem)
-                        .feeAmount(feeAmount.get())
-                        .build())
-                );
-            }
+            feeAmount.ifPresent(amount -> fees.add(ExtraFee.builder()
+                    .id(idCounter++)
+                    .vehicle(vehicle)
+                    .codeItem(codeItem)
+                    .feeAmount(amount)
+                    .build()));
         }
         return fees;
     }
@@ -67,34 +65,39 @@ public class TestUtil {
         float airTemperature = 10F;
         float windSpeed = 0F;
         String phenomenon = "";
-        for (CodeItem codeItem : codes) {
-            String code = codeItem.getCode();
-            if (code.equals(WeatherCode.AT_UNDER_MINUS_TEN.name())) {
+        for (CodeItem code : codes) {
+            if (code.equals(CodeItemUtil.AT_UNDER_MINUS_TEN)) {
                 airTemperature = -20f;
             }
-            if (code.equals(WeatherCode.AT_MINUS_TEN_TO_ZERO.name())) {
+            if (code.equals(CodeItemUtil.AT_MINUS_TEN_TO_ZERO)) {
                 airTemperature = -5f;
             }
-            if (code.equals(WeatherCode.WS_ABOVE_TWENTY.name())) {
+            if (code.equals(CodeItemUtil.WS_ABOVE_TWENTY)) {
                 windSpeed = 30f;
             }
-            if (code.equals(WeatherCode.WS_TEN_TO_TWENTY.name())) {
+            if (code.equals(CodeItemUtil.WS_TEN_TO_TWENTY)) {
                 windSpeed = 15f;
             }
-            if (code.equals(WeatherCode.WP_SNOW_SLEET.name())) {
-                phenomenon = "snow";
+            if (code.equals(CodeItemUtil.WP_SNOW_SLEET)) {
+                phenomenon = "some SnoW";
             }
-            if (code.equals(WeatherCode.WP_RAIN.name())) {
-                phenomenon = "rain";
+            if (code.equals(CodeItemUtil.WP_RAIN)) {
+                phenomenon = "contains rAIN";
             }
-            if (code.equals(WeatherCode.WP_GLAZE_HAIL_THUNDER.name())) {
-                phenomenon = "thunder";
+            if (code.equals(CodeItemUtil.WP_GLAZE_HAIL_THUNDER)) {
+                phenomenon = "BIG THUNDER";
             }
         }
+
+        WeatherStationDto stationDto = WeatherStationDto.builder()
+                .WMOcode(station.getWMOcode())
+                .name(station.getName())
+                .build();
+
         return WeatherMeasurementDto.builder()
                 .id(idCounter++)
                 .timestamp(new Timestamp(500000))
-                .weatherStation(station)
+                .weatherStation(stationDto)
                 .airTemperature(airTemperature)
                 .windSpeed(windSpeed)
                 .phenomenon(phenomenon)
@@ -139,32 +142,35 @@ public class TestUtil {
 
     /**
      * Return Optional of extra fee amount if it is available for given vehicle and code, else Optional.empty()
-     * @param vehicle vehicle
+     *
+     * @param vehicle  vehicle
      * @param codeItem CodeItem tied to extra fee
      * @return Optional of BigDecimal
      */
-    private static Optional<BigDecimal> getExtraFeeAmount(Vehicle vehicle, CodeItem codeItem) {
+    private static Optional<BigDecimal> getExtraFeeAmount(Vehicle vehicle, CodeItem code) {
         String vehicleType = vehicle.getType().toLowerCase();
-        String code = codeItem.getCode();
-        if (vehicleType.equals("scooter") || vehicleType.equals("bike")) {
-            if (code.equals(WeatherCode.AT_UNDER_MINUS_TEN.name())) {
-                return Optional.of(BigDecimal.ONE);
-            }
-            if (code.equals(WeatherCode.AT_MINUS_TEN_TO_ZERO.name())) {
-                return Optional.of(BigDecimal.valueOf(0.5));
-            }
-            if (code.equals(WeatherCode.WP_SNOW_SLEET.name())) {
-                return Optional.of(BigDecimal.ONE);
-            }
-            if (code.equals(WeatherCode.WP_RAIN.name())) {
-                return Optional.of(BigDecimal.valueOf(0.5));
-            }
-        }
+
         if (vehicleType.equals("bike")) {
-            if (code.equals(WeatherCode.WS_TEN_TO_TWENTY.name())) {
+            if (code.equals(CodeItemUtil.WS_TEN_TO_TWENTY)) {
                 return Optional.of(BigDecimal.valueOf(0.5));
             }
         }
+
+        if (vehicleType.equals("scooter") || vehicleType.equals("bike")) {
+            if (code.equals(CodeItemUtil.AT_UNDER_MINUS_TEN)) {
+                return Optional.of(BigDecimal.ONE);
+            }
+            if (code.equals(CodeItemUtil.AT_MINUS_TEN_TO_ZERO)) {
+                return Optional.of(BigDecimal.valueOf(0.5));
+            }
+            if (code.equals(CodeItemUtil.WP_SNOW_SLEET)) {
+                return Optional.of(BigDecimal.ONE);
+            }
+            if (code.equals(CodeItemUtil.WP_RAIN)) {
+                return Optional.of(BigDecimal.valueOf(0.5));
+            }
+        }
+
         return Optional.empty();
     }
 }
