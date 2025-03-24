@@ -24,7 +24,7 @@ public final class GlobalExceptionHandler {
     @ExceptionHandler({WeatherDataException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ExceptionResponse handleWeatherDataException(WeatherDataException e) {
-        log.error(e.getMessage() + "WMO :" + e.getWMOcode(), e);
+        log.error(String.format("err: %s. WMO: %d", e.getMessage(), e.getWMOcode()), e);
         return new ExceptionResponse(e.getMessage());
     }
 

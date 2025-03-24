@@ -15,12 +15,11 @@ public interface SevereWeatherConditionRepository extends JpaRepository<SevereWe
      * If the rule defines only min OR max, it is exclusive.
      */
     @Query("""
-                
-                SELECT wc FROM SevereWeatherCondition wc
-                WHERE wc.codeItem.codeClass = :codeClass
-                AND (:measurement BETWEEN wc.minMeasurement AND wc.maxMeasurement
-                OR wc.minMeasurement IS NULL AND :measurement < wc.maxMeasurement
-                OR wc.maxMeasurement IS NULL AND :measurement > wc.minMeasurement)
+            SELECT wc FROM SevereWeatherCondition wc
+            WHERE wc.codeItem.codeClass = :codeClass
+            AND (:measurement BETWEEN wc.minMeasurement AND wc.maxMeasurement
+            OR wc.minMeasurement IS NULL AND :measurement < wc.maxMeasurement
+            OR wc.maxMeasurement IS NULL AND :measurement > wc.minMeasurement)
             """)
     List<SevereWeatherCondition> findAllByCodeItemCodeClassAndMeasurement(
             @Param("codeClass") String codeClass,
