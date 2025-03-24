@@ -52,8 +52,12 @@ public class DeliveryFeeService {
             throw new DeliveryFeeException("Usage of selected vehicle type is forbidden");
         }
 
+        return calculateDeliveryFee(cityId, vehicleId, weatherCodes);
+    }
+
+    private DeliveryFeeDto calculateDeliveryFee(Long cityId, Long vehicleId, List<CodeItem> weatherCodes) throws DeliveryFeeException {
         BigDecimal baseFee = baseFeeService.getBaseFee(cityId, vehicleId).orElseThrow(
-                () -> new DeliveryFeeException("This type of vehicle is not allowed in this city"))
+                        () -> new DeliveryFeeException("This type of vehicle is not allowed in this city"))
                 .getFeeAmount();
         BigDecimal extraFee = getTotalExtraFeeAmount(extraFeeService.getWeatherExtraFees(weatherCodes, vehicleId));
         BigDecimal totalFee = baseFee.add(extraFee);
@@ -68,10 +72,8 @@ public class DeliveryFeeService {
     }
 
     private BigDecimal getTotalExtraFeeAmount(List<ExtraFee> extraFees) {
-        BigDecimal total = BigDecimal.ZERO;
-        for (ExtraFee extraFee : extraFees) {
-            total = total.add(extraFee.getFeeAmount());
-        }
-        return total;
+        return extraFees.stream()
+                .map(ExtraFee::getFeeAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
