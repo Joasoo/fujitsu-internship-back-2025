@@ -74,7 +74,8 @@ public class WeatherServiceTest {
     private void assertWeatherMeasurementDto(WeatherMeasurement expected, WeatherMeasurementDto actual) {
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getTimestamp(), actual.getTimestamp());
-        assertEquals(expected.getWeatherStation(), actual.getWeatherStation());
+        assertEquals(expected.getWeatherStation().getName(), actual.getWeatherStation().getName());
+        assertEquals(expected.getWeatherStation().getWMOcode(), actual.getWeatherStation().getWMOcode());
         assertEquals(expected.getAirTemperature(), actual.getAirTemperature());
         assertEquals(expected.getWindSpeed(), actual.getWindSpeed());
         assertEquals(expected.getPhenomenon(), actual.getPhenomenon());
